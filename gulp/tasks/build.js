@@ -1,27 +1,30 @@
-var gulp        = require('gulp');
-var runSequence = require('run-sequence');
-var config      = require('../config');
+var gulp = require('gulp');
+var config = require('../config');
 
-function build(cb) {
-    runSequence(
-        'clean',
-        'sass',
-        'nunjucks',
-        'webpack',
-        'copy',
-        'list-pages',
-        cb
-    );
-}
+gulp.task('set:prod', function(done) {
+	config.setEnv('production');
+	config.logEnv();
 
-gulp.task('build', function(cb) {
-    config.setEnv('production');
-    config.logEnv();
-    build(cb);
+	done();
 });
 
-gulp.task('build:dev', function(cb) {
-    config.setEnv('development');
-    config.logEnv();
-    build(cb);
+gulp.task('set:dev', function(done) {
+	config.setEnv('development');
+	config.logEnv();
+
+	done();
 });
+
+gulp.task(
+	'build',
+	gulp.series([ 'set:prod', 'clean', 'sass', 'nunjucks', 'webpack', 'copy', 'list-pages' ], (cb) => {
+		cb();
+	})
+);
+
+gulp.task(
+	'build:dev',
+	gulp.series([ 'set:dev', 'clean', 'sass', 'nunjucks', 'webpack', 'copy', 'list-pages' ], (cb) => {
+		cb();
+	})
+);
